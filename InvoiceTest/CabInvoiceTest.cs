@@ -6,7 +6,7 @@
 
 using NUnit.Framework;
 using CabInvoiceGenerator;
-using System;
+using System.Collections.Generic;
 
 namespace CabInvoiceTest
 {
@@ -55,10 +55,7 @@ namespace CabInvoiceTest
         /// </test 3>
         [Test]
         public void GivenDistanceAndTimeOfMultiRidesToInvoiceGeneratorShouldInhancedInvoice()
-        {      
-            // Local variables
-            bool exceptedInvoice = true;
-            bool returnInvoice = false;
+        {
             // sending two rides distance in double and also time in double
             Ride[] rides =
             {
@@ -72,13 +69,31 @@ namespace CabInvoiceTest
                 totalFare = 47.5,
                 averageFarePerRide = 23.75
             };
-            //Checkoing all three returnSummary values are equal to exceptedSummary
-            //iF yes then returnInvoice will be 'true'
-            if (returnSummery.totalNumberOfRides == expectedSummery.totalNumberOfRides && returnSummery.totalFare == expectedSummery.totalFare && returnSummery.averageFarePerRide == expectedSummery.averageFarePerRide)
+            Assert.AreEqual(returnSummery.totalFare, expectedSummery.totalFare);
+            Assert.AreEqual(expectedSummery.totalNumberOfRides,returnSummery.totalNumberOfRides);
+            Assert.AreEqual(expectedSummery.averageFarePerRide,returnSummery.averageFarePerRide);
+        
+        }
+
+        /// <Test 4>
+        /// Invoice Service
+        /// Given a user id, the Invoice Service gets the List of rides from the RideRepository,
+        /// and returns theInvoice.
+        /// </Test 4>
+        [Test]
+        public void GivenDistanceAndTimeOfMultiRidesToUserIdShouldTotalFare()
+        {
+            string userId = "nit@123";
+            Ride[] rides =
             {
-                returnInvoice = true;
-            }
-            Assert.AreEqual(exceptedInvoice, returnInvoice);           
+                new Ride(2.0,1.0),
+                new Ride(2.5,1.5)
+            };
+            RideRepository rideRepository = new RideRepository();
+            rideRepository.AddRides(userId, rides);
+            InvoiceSummery retunTotal = invoice.CalculateCabFare(rideRepository.GetRides(userId));
+            Assert.AreEqual(47.5, retunTotal.totalFare);
+
         }
     }
 }
