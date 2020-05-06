@@ -9,10 +9,14 @@ namespace CabInvoiceGenerator
 {
     public class InvoiceGenerator
     {
-        // Declared and Initialised Variables
-        readonly private double costPerKiloMeter = 10.0;
-        readonly private double costPerMinute = 1.0;
-        readonly private double minimumFare = 5.0;
+        // Declared and Initialised Variables of normal rides
+        readonly private double normaolCostPerKiloMeter = 10.0;
+        readonly private double normalCostPerMinute = 1.0;
+        readonly private double normalMinimumFare = 5.0;
+        // Declared and Initialised Variables of Premimum rides
+        readonly private double premiusCostPerKiloMeter = 15.0;
+        readonly private double premimunCostPerMinute = 2.0;
+        readonly private double premimunMinimumFare = 20.0;
 
         /// <InvoiceGenerator>
         /// default Constructor
@@ -26,30 +30,45 @@ namespace CabInvoiceGenerator
         /// </CalculateCabFare>
         /// <minimumFare></returns>
         /// <totalFare></returns>
-        public double CalculateCabFare(double runningDistance, double runningTime)
+        public double CalculateCabFare(string rideType, double runningDistance, double runningTime)
         {
-            double totalFare = (runningDistance * costPerKiloMeter) + (runningTime * costPerMinute);
-            if (totalFare < minimumFare)
+            // Calculation for normalFare
+            if (rideType == "normal")
             {
-                return minimumFare;
+                double totalFare = (runningDistance * normaolCostPerKiloMeter) + (runningTime * normalCostPerMinute);
+                if (totalFare < normalMinimumFare)
+                {
+                    return normalMinimumFare;
+                }
+                return totalFare;
             }
-            return totalFare;
-        }
 
-        /// <CalculateCabFare>
-        /// Method to calculated fare of multiple rides
-        /// </CalculateCabFare>
-        /// <param name="rides"></param>
-        /// <returns></returns>
-        public InvoiceSummery CalculateCabFare(Ride[] rides)
+            // Calculation for premimunFare
+            if (rideType=="premium")
+            {
+                double totalFare = (runningDistance * premiusCostPerKiloMeter) + (runningTime * premimunCostPerMinute);
+                if (totalFare > premimunMinimumFare)
+                {
+                    return totalFare;
+                }               
+            }
+            return premimunMinimumFare;
+        }
+            /// <CalculateCabFare>
+            /// Method to calculated fare of multiple rides
+            /// </CalculateCabFare>
+            /// <param name="rides"></param>
+            /// <returns></returns>
+            public InvoiceSummery CalculateCabFare(Ride[] rides)
         {
                 int totalNumberOfRides=0;
                 double totalFare=0;
             foreach (Ride ride in rides)
             {
-                totalFare += CalculateCabFare(ride.rideDistance,ride.rideTime);
+                totalFare += CalculateCabFare(ride.rideType,ride.rideDistance,ride.rideTime);
                 totalNumberOfRides+=1;
             }
+            // Object of InvoiceSummery and accessing data from class
             InvoiceSummery invoiceSummery = new InvoiceSummery();
             invoiceSummery.totalNumberOfRides = totalNumberOfRides;
             invoiceSummery.totalFare = totalFare;

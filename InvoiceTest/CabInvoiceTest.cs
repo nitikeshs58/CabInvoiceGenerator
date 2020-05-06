@@ -13,6 +13,7 @@ namespace CabInvoiceTest
     public class Tests
     {
         InvoiceGenerator invoice = new InvoiceGenerator();
+        RideRepository rideRepository = new RideRepository();
 
         [SetUp]
         public void Setup()
@@ -27,7 +28,7 @@ namespace CabInvoiceTest
         [Test]
         public void GivenDistanceAndTimeToInvoiceGeneratorShouldReturnTotalFare()
         {
-            Assert.AreEqual(52, invoice.CalculateCabFare(5.0, 2.0));
+            Assert.AreEqual(52, invoice.CalculateCabFare("normal",5.0, 2.0));
         }
 
         /// <test 2>
@@ -40,8 +41,8 @@ namespace CabInvoiceTest
             //Custom Arrray of Ride class
             Ride[] rides =
                 {
-                new Ride(2.0,1.0),
-                new Ride(2.5,1.5)
+                new Ride("normal",2.0,1.0),
+                new Ride("normal",2.5,1.5)
                 };
             var exceptedSummery = 47.5;
             InvoiceSummery returnSummery = invoice.CalculateCabFare(rides);
@@ -59,8 +60,8 @@ namespace CabInvoiceTest
             // sending two rides distance in double and also time in double
             Ride[] rides =
             {
-                new Ride(2.0,1.0),
-                new Ride(2.5,1.5)
+                new Ride("normal",2.0,1.0),
+                new Ride("normal",2.5,1.5)
             };
             InvoiceSummery returnSummery = invoice.CalculateCabFare(rides);
             InvoiceSummery expectedSummery = new InvoiceSummery
@@ -71,14 +72,13 @@ namespace CabInvoiceTest
             };
             Assert.AreEqual(returnSummery.totalFare, expectedSummery.totalFare);
             Assert.AreEqual(expectedSummery.totalNumberOfRides,returnSummery.totalNumberOfRides);
-            Assert.AreEqual(expectedSummery.averageFarePerRide,returnSummery.averageFarePerRide);
-        
+            Assert.AreEqual(expectedSummery.averageFarePerRide,returnSummery.averageFarePerRide);        
         }
 
         /// <Test 4>
         /// Invoice Service
         /// Given a user id, the Invoice Service gets the List of rides from the RideRepository,
-        /// and returns theInvoice.
+        /// and returns avergae of normalFare.
         /// </Test 4>
         [Test]
         public void GivenDistanceAndTimeOfMultiRidesToUserIdShouldTotalFare()
@@ -86,14 +86,31 @@ namespace CabInvoiceTest
             string userId = "nit@123";
             Ride[] rides =
             {
-                new Ride(2.0,1.0),
-                new Ride(2.5,1.5)
+                new Ride("normal",2.0,1.0),
+                new Ride("normal",2.5,1.5)
             };
-            RideRepository rideRepository = new RideRepository();
             rideRepository.AddRides(userId, rides);
             InvoiceSummery retunTotal = invoice.CalculateCabFare(rideRepository.GetRides(userId));
             Assert.AreEqual(47.5, retunTotal.totalFare);
+        }
 
+        /// <Test 5>
+        /// Invoice Service
+        /// Given a user id, will have 'normal' and 'premimun' ridethe Invoice Service gets the List of rides from the RideRepository,
+        /// and returns Total Average of normalFare and premimumFare.
+        /// </Test 5>
+        [Test]
+        public void GivenUserIdOfMultiRidesToUserIdShouldTotalFare()
+        {
+            string userId = "Raj@123";
+            Ride[] rides =
+            {
+                new Ride("normal",2.0,1.0),
+                new Ride("premium",2.5,1.5)
+            };
+            rideRepository.AddRides(userId, rides);
+            InvoiceSummery retunTotal = invoice.CalculateCabFare(rideRepository.GetRides(userId));
+            Assert.AreEqual(61.5, retunTotal.totalFare);
         }
     }
 }
